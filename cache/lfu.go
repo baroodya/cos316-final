@@ -58,8 +58,9 @@ func (lfu *LFU) Get(key string) (value []byte, ok bool) {
 	item := *itemPointer
 
 	// update priority of element in priority queue
-	lfu.pq.Update(itemPointer, item.priority + 1)
+	lfu.pq.Update(itemPointer, item.priority + 1.0)
 	item.priority++
+	item.accesses++
 	lfu.items[key] = itemPointer
 
 	// // Print the lookup table
@@ -140,7 +141,8 @@ func (lfu *LFU) Set(key string, value []byte) bool {
 		} else {
 			item := &Item{
 				key: key, 
-				priority: 1,
+				priority: 1.0,
+				accesses: 1,
 			}
 
 			heap.Push(&lfu.pq, item)

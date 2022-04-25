@@ -10,7 +10,8 @@ import (
 // An Item is something we manage in a priority queue.
 type Item struct {
 	key    string // The value of the item; arbitrary.
-	priority int    // The priority of the item in the queue.
+	priority float64    // The priority of the item in the queue.
+	accesses int // the number of accesses to the item
 	// The index is needed by update and is maintained by the heap.Interface methods.
 	index    int // The index of the item in the heap.
 }
@@ -58,7 +59,7 @@ func (pq *PriorityQueue) Remove(item *Item) {
 }
 
 // update modifies the priority and value of an Item in the queue.
-func (pq *PriorityQueue) Update(item *Item, priority int) {
+func (pq *PriorityQueue) Update(item *Item, priority float64) {
 	item.priority = priority
 
 	// // Print the priority queue.
@@ -81,8 +82,8 @@ func (pq *PriorityQueue) Update(item *Item, priority int) {
 // and then removes the items in priority order.
 func main() {
 	// Some items and their priorities.
-	items := map[string]int{
-		"banana": 3, "apple": 2, "pear": 4,
+	items := map[string]float64{
+		"banana": 3.0, "apple": 2.0, "pear": 4.0,
 	}
 
 	// Create a priority queue, put the items in it, and
@@ -110,6 +111,6 @@ func main() {
 	// Take the items out; they arrive in decreasing priority order.
 	for pq.Len() > 0 {
 		item := heap.Pop(&pq).(*Item)
-		fmt.Printf("%.2d:%s ", item.priority, item.key)
+		fmt.Printf("%.2f:%s ", item.priority, item.key)
 	}
 }
