@@ -1,6 +1,8 @@
 package cache
 
-import "container/heap"
+import (
+	"container/heap"
+)
 
 // An LFU is a fixed-size in-memory cache with least-frequently-used eviction
 type LFU struct {
@@ -60,6 +62,12 @@ func (lfu *LFU) Get(key string) (value []byte, ok bool) {
 	item.priority++
 	lfu.items[key] = itemPointer
 
+	// // Print the lookup table
+	// for k, v := range lfu.lookup {
+	// 	fmt.Printf("%s: %s. Accesses: %d\n", k, string(*v), lfu.items[k].priority)
+	// }
+	// fmt.Println()
+
 	lfu.stats.Hits++
 	return *valPointer, true
 }
@@ -93,6 +101,10 @@ func (lfu *LFU) Set(key string, value []byte) bool {
 		if newElSize > lfu.maxSize {
 			return false
 		}
+
+		// // print key value pair
+		// fmt.Printf("%s: %s\n", key, value)
+		// fmt.Println("------------------------------------------------------")
 	
 		// Check to see if we're updating an existing key or adding a new key
 		existsInQ := false
@@ -107,6 +119,13 @@ func (lfu *LFU) Set(key string, value []byte) bool {
 		for lfu.currSize+addedSize > lfu.maxSize {
 			EvictLFU(lfu)
 		}
+
+		// // Print the lookup table
+		// for k, v := range lfu.lookup {
+		// 	fmt.Printf("%s: %s. Accesses: %d\n", k, string(*v), lfu.items[k].priority)
+		// }
+		// fmt.Println()
+
 	
 		// Add new key:value pair
 		if existsInQ {
@@ -136,6 +155,7 @@ func (lfu *LFU) Set(key string, value []byte) bool {
 // Evict the last element added to list
 func EvictLFU(lfu *LFU) {
 	item := heap.Pop(&lfu.pq).(*Item)
+	// fmt.Printf("Evicting %s: %s. Accesses: %d\n", item.key, string(*lfu.lookup[item.key]), item.priority)
 	key := item.key
 	value := *(lfu.lookup[key])
 	delete(lfu.lookup, key)

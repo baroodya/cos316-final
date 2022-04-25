@@ -22,7 +22,7 @@ func (pq PriorityQueue) Len() int { return len(pq) }
 
 func (pq PriorityQueue) Less(i, j int) bool {
 	// We want Pop to give us the item with the lowest priority so we use less than here.
-	return pq[i].priority > pq[j].priority
+	return pq[i].priority < pq[j].priority
 }
 
 func (pq PriorityQueue) Swap(i, j int) {
@@ -60,7 +60,21 @@ func (pq *PriorityQueue) Remove(item *Item) {
 // update modifies the priority and value of an Item in the queue.
 func (pq *PriorityQueue) Update(item *Item, priority int) {
 	item.priority = priority
+
+	// // Print the priority queue.
+	// fmt.Println("Priority queue:")
+	// for i := 0; i < pq.Len(); i++ {
+	// 	fmt.Printf("%d -> %.2d:%s\n", (*pq)[i].index, (*pq)[i].priority, (*pq)[i].key)
+	// }
+	// fmt.Println()
 	heap.Fix(pq, item.index)
+
+	// fmt.Println("Updated priority queue:")
+	// // Print the priority queue.
+	// for i := 0; i < pq.Len(); i++ {
+	// 	fmt.Printf("%d -> %.2d:%s\n", (*pq)[i].index, (*pq)[i].priority, (*pq)[i].key)
+	// }
+	// fmt.Println()
 }
 
 // This example creates a PriorityQueue with some items, adds and manipulates an item,

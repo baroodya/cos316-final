@@ -85,3 +85,179 @@ func TestRemove(t * testing.T) {
 		}
 	}
 }
+
+func TestEvictSimple(t *testing.T) {
+	capacity := 100
+	lfu := NewLfu(capacity)
+	checkCapacity(t, lfu, capacity)
+
+	// sets 0 thru 9
+	for i := 0; i < 10; i++ {
+		key := fmt.Sprintf("____%d", i)
+		val := []byte(key)
+		ok := lfu.Set(key, val)
+		if !ok {
+			t.Errorf("Failed to add binding with key: %s", key)
+			t.FailNow()
+		}
+	}
+
+	// 0: 1
+	// 1: 1
+	// 2: 1
+	// 3: 1
+	// 4: 1
+	// 5: 1
+	// 6: 1
+	// 7: 1
+	// 8: 1
+	// 9: 1
+
+	// get 0 thru 8 
+	for i := 0; i < 9; i++ {
+		key := fmt.Sprintf("____%d", i)
+		res, found := lfu.Get(key)
+		if !found {
+			t.Errorf("Could not find %s as binding with key: %s", res, key)
+			t.FailNow()
+		}
+	}
+
+	// 0: 2
+	// 1: 2
+	// 2: 2
+	// 3: 2
+	// 4: 2
+	// 5: 2
+	// 6: 2
+	// 7: 2
+	// 8: 2
+	// 9: 1
+
+	// set 10
+	key := fmt.Sprintf("___10")
+	val := []byte("____a")
+	ok := lfu.Set(key, val)
+	if !ok {
+		t.Errorf("Failed to add binding with key: %s", key)
+		t.FailNow()
+	}
+
+	// 0: 2
+	// 1: 2
+	// 2: 2
+	// 3: 2
+	// 4: 2
+	// 5: 2
+	// 6: 2
+	// 7: 2
+	// 8: 2
+	// 10: 1
+
+
+	// gets 0 thru 10, 9 should not get cache hit
+	for i := 0; i <= 10; i++ {
+		key = fmt.Sprintf("____%d", i)
+		if i == 10 {
+			key = fmt.Sprintf("___10")
+		}
+		res, found := lfu.Get(key)
+		// fmt.Printf("%s: %s. %t\n", key, res, found)
+		if found && i == 9 {
+			t.Errorf("Found %s as binding with key: %s", res, key)
+			t.FailNow()
+		} else if !found && i != 9 {
+			t.Errorf("Could not find %s as binding with key: %s", res, key)
+			t.FailNow()
+		}
+	}
+}
+
+func TestEvict(t *testing.T) {
+	capacity := 100
+	lfu := NewLfu(capacity)
+	checkCapacity(t, lfu, capacity)
+
+	// sets 0 thru 9
+	for i := 0; i < 10; i++ {
+		key := fmt.Sprintf("____%d", i)
+		val := []byte(key)
+		ok := lfu.Set(key, val)
+		if !ok {
+			t.Errorf("Failed to add binding with key: %s", key)
+			t.FailNow()
+		}
+	}
+
+	// 0: 1
+	// 1: 1
+	// 2: 1
+	// 3: 1
+	// 4: 1
+	// 5: 1
+	// 6: 1
+	// 7: 1
+	// 8: 1
+	// 9: 1
+
+	// get 0 thru 9 
+	for i := 0; i < 10; i++ {
+		for j := 0; j <= i; j++ {
+			key := fmt.Sprintf("____%d", i)
+			res, found := lfu.Get(key)
+			if !found {
+				t.Errorf("Could not find %s as binding with key: %s", res, key)
+				t.FailNow()
+			}
+		}
+	}
+
+	// 0: 2
+	// 1: 3
+	// 2: 4
+	// 3: 5
+	// 4: 6
+	// 5: 7
+	// 6: 8
+	// 7: 9
+	// 8: 10
+	// 9: 11
+
+	// set 10
+	key := fmt.Sprintf("___10")
+	val := []byte("____a")
+	ok := lfu.Set(key, val)
+	if !ok {
+		t.Errorf("Failed to add binding with key: %s", key)
+		t.FailNow()
+	}
+
+	// 1: 3
+	// 2: 4
+	// 3: 5
+	// 4: 6
+	// 5: 7
+	// 6: 8
+	// 7: 9
+	// 8: 10
+	// 9: 11
+	// 10: 1
+
+
+	// gets 0 thru 10, 0 should not get cache hit
+	for i := 0; i <= 10; i++ {
+		key = fmt.Sprintf("____%d", i)
+		if i == 10 {
+			key = fmt.Sprintf("___10")
+		}
+		res, found := lfu.Get(key)
+		// fmt.Printf("%s: %s. %t\n", key, res, found)
+		if found && i == 0 {
+			t.Errorf("Found %s as binding with key: %s", res, key)
+			t.FailNow()
+		} else if !found && i != 0 {
+			t.Errorf("Could not find %s as binding with key: %s", res, key)
+			t.FailNow()
+		}
+	}
+}
