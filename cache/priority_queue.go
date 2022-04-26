@@ -70,12 +70,12 @@ func (pq *PriorityQueue) Update(item *Item, priority float64) {
 	// fmt.Println()
 	heap.Fix(pq, item.index)
 
-	// fmt.Println("Updated priority queue:")
-	// // Print the priority queue.
-	// for i := 0; i < pq.Len(); i++ {
-	// 	fmt.Printf("%d -> %.2d:%s\n", (*pq)[i].index, (*pq)[i].priority, (*pq)[i].key)
-	// }
-	// fmt.Println()
+	fmt.Println("Updated priority queue:")
+	// Print the priority queue.
+	for i := 0; i < pq.Len(); i++ {
+		fmt.Printf("%d -> %.2f:%s\n", (*pq)[i].index, (*pq)[i].priority, (*pq)[i].key)
+	}
+	fmt.Println()
 }
 
 // This example creates a PriorityQueue with some items, adds and manipulates an item,

@@ -21,7 +21,7 @@ type LogLFU struct {
 }
 
 // NewLogLFU returns a pointer to a new LogLFU with a capacity to store limit bytes
-func NewLfu(limit int) *LogLFU {
+func NewLogLfu(limit int) *LogLFU {
 	cache := new(LogLFU)
 
 	cache.lookup = map[string]*[]byte{}
@@ -37,9 +37,9 @@ func NewLfu(limit int) *LogLFU {
 	cache.stats.Misses = 0
 
 	// Constant multiplier for the priority of a key
-	cache.alpha = 0.5
+	cache.alpha = 1.0
 	// Constant Base for the log operation
-	cache.beta = 2.0
+	cache.beta = 1.25
 	cache.cacheAccesses = 0
 	return cache
 }
@@ -87,9 +87,9 @@ func (lfu *LogLFU) Get(key string) (value []byte, ok bool) {
 }
 
 // priority = alpha * log_beta(cache accesses) * (key accesses)
-func (lfu *LogLFU) getLogPriority(accesses float64) float64 {
+func (lfu *LogLFU) getLogPriority(accesses int) float64 {
 	changeOfBase := math.Log1p(float64(lfu.cacheAccesses)) / math.Log1p(lfu.beta)
-	return lfu.alpha * changeOfBase * accesses
+	return lfu.alpha * changeOfBase * float64(accesses)
 }
 
 // Remove removes and returns the value associated with the given key, if it exists.
