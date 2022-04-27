@@ -28,7 +28,7 @@ import (
 
 func TestLogGet(t *testing.T) {
 	capacity := 64
-	lfu := NewLogLfu(capacity)
+	lfu := NewLogLfu(capacity, 1.0, 2.0)
 	checkCapacity(t, lfu, capacity)
 
 	for i := 0; i < 4; i++ {
@@ -50,7 +50,7 @@ func TestLogGet(t *testing.T) {
 
 func TestLogRemove(t * testing.T) {
 	capacity := 64
-	lfu := NewLogLfu(capacity)
+	lfu := NewLogLfu(capacity, 1.0, 2.0)
 	checkCapacity(t, lfu, capacity)
 
 	for i := 0; i < 4; i++ {
@@ -88,7 +88,7 @@ func TestLogRemove(t * testing.T) {
 
 func TestLogEvictSimple(t *testing.T) {
 	capacity := 100
-	lfu := NewLogLfu(capacity)
+	lfu := NewLogLfu(capacity, 1.0, 2.0)
 	checkCapacity(t, lfu, capacity)
 
 	// sets 0 thru 9
@@ -175,7 +175,7 @@ func TestLogEvictSimple(t *testing.T) {
 
 func TestLogEvict(t *testing.T) {
 	capacity := 100
-	lfu := NewLogLfu(capacity)
+	lfu := NewLogLfu(capacity, 1.0, 2.0)
 	checkCapacity(t, lfu, capacity)
 
 	// sets 0 thru 9
