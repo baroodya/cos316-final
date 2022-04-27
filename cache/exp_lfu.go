@@ -21,7 +21,7 @@ type ExpLFU struct {
 }
 
 // NewExpLFU returns a pointer to a new ExpLFU with a capacity to store limit bytes
-func NewExpLfu(limit int) *ExpLFU {
+func NewExpLfu(limit int, alpha float64, beta float64) *ExpLFU {
 	cache := new(ExpLFU)
 
 	cache.lookup = map[string]*[]byte{}
@@ -37,9 +37,9 @@ func NewExpLfu(limit int) *ExpLFU {
 	cache.stats.Misses = 0
 
 	// Constant multiplier for the priority of a key
-	cache.alpha = 1.0
+	cache.alpha = alpha
 	// Constant Base for the log operation
-	cache.beta = 1.25
+	cache.beta = beta
 	cache.cacheAccesses = 0
 	return cache
 }

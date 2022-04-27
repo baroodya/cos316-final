@@ -14,12 +14,11 @@ type LFUDA struct {
 	currSize int
 	stats *Stats
 
-	alpha float64
 	cacheAccesses int
 }
 
 // NewLFUDA returns a pointer to a new LFUDA with a capacity to store limit bytes
-func NewLFUDA(limit int, alpha float64) *LFUDA {
+func NewLFUDA(limit int) *LFUDA {
 	cache := new(LFUDA)
 
 	cache.lookup = map[string]*[]byte{}
@@ -35,7 +34,6 @@ func NewLFUDA(limit int, alpha float64) *LFUDA {
 	cache.stats.Misses = 0
 
 	// Constant multiplier for the priority of a key
-	cache.alpha = alpha
 	cache.cacheAccesses = 0
 	return cache
 }

@@ -19,7 +19,7 @@ type LinearLFU struct {
 }
 
 // NewLinearLFU returns a pointer to a new LinearLFU with a capacity to store limit bytes
-func NewLinearLfu(limit int) *LinearLFU {
+func NewLinearLfu(limit int, alpha float64) *LinearLFU {
 	cache := new(LinearLFU)
 
 	cache.lookup = map[string]*[]byte{}
@@ -35,7 +35,7 @@ func NewLinearLfu(limit int) *LinearLFU {
 	cache.stats.Misses = 0
 
 	// Constant multiplier for the priority of a key
-	cache.alpha = 1.0
+	cache.alpha = alpha
 	cache.cacheAccesses = 0
 	return cache
 }
