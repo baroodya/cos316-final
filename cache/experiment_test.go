@@ -51,7 +51,7 @@ import (
 
 		var randVal float64
 		// if i < trials / 4 {
-		// 	randVal = float64(i % (minVal))
+		// 	randVal = float64((minVal)) * rand.Float64()
 		// } else if i < trials / 2 {
 		// 	randVal = float64(i % minVal + minVal)
 		// } else {
@@ -129,15 +129,16 @@ import (
 	line.SetGlobalOptions(
 		charts.WithTitleOpts(opts.Title{
 			Title:    "Hit Rate for Cache Algorithms",
+			// Subtitle: "First 25000 accesses are randomly chosen between 0 and 256, last 75000 are randomly chosen between 256 and 512", 
 			Subtitle: "Accesses are random between 0 and 2048, according to the PDF: e^(-10 * x^2)",
 		}),
 		charts.WithLegendOpts(opts.Legend{Show: true}),
 		charts.WithColorsOpts(opts.Colors{"blue", "red", "green", "orange", "purple"}),
 		// charts.WithDataZoomOpts(opts.DataZoom{
 		// 	Type:       "inside",
-		// 	Start:      50,
-		// 	End:        100,
-		// 	XAxisIndex: []int{0},
+		// 	Start:      100,
+		// 	End:        150,
+		// 	YAxisIndex: []int{0},
 		// }),
 	)
 
