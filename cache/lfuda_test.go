@@ -1,9 +1,9 @@
 /******************************************************************************
- * linear_lfu_test.go
+ * lfuda_test.go
  * Author:
  * Usage:    `go test`  or  `go test -v`
  * Description:
- *    An incomplete unit testing suite for linear_lfu.go
+ *    An testing suite for lfuda.go
  ******************************************************************************/
 
 package cache
@@ -22,9 +22,9 @@ import (
 /*                                  Tests                                     */
 /******************************************************************************/
 
-func TestLinearGet(t *testing.T) {
+func TestLFUDASetGet(t *testing.T) {
 	capacity := 64
-	lfu := NewLinearLfu(capacity, 1.0)
+	lfu := NewLFUDA(capacity)
 	checkCapacity(t, lfu, capacity)
 
 	for i := 0; i < 4; i++ {
@@ -44,9 +44,9 @@ func TestLinearGet(t *testing.T) {
 	}
 }
 
-func TestLinearRemove(t *testing.T) {
+func TestLFUDARemove(t *testing.T) {
 	capacity := 64
-	lfu := NewLinearLfu(capacity, 1.0)
+	lfu := NewLFUDA(capacity)
 	checkCapacity(t, lfu, capacity)
 
 	for i := 0; i < 4; i++ {
@@ -82,9 +82,29 @@ func TestLinearRemove(t *testing.T) {
 	}
 }
 
-func TestLinearEvictSimple(t *testing.T) {
+/*func TestLFUDALen(t *testing.T) {
+	// length of empty
+
+	// add some and verify length
+
+	// take some out and verify length
+
+}
+
+func TestLFUDAMaxStorage(t *testing.T) {
+	// set max storage to real number
+
+	// set max storage to 0
+
+}
+
+func TestLFUDARemainingStorage(t *testing.T) {
+
+} */
+
+func TestLFUDAEvictSimple(t *testing.T) {
 	capacity := 100
-	lfu := NewLinearLfu(capacity, 1.0)
+	lfu := NewLFUDA(capacity)
 	checkCapacity(t, lfu, capacity)
 
 	// sets 0 thru 9
@@ -168,9 +188,9 @@ func TestLinearEvictSimple(t *testing.T) {
 	}
 }
 
-func TestLinearEvict(t *testing.T) {
+func TestLFUDAEvict(t *testing.T) {
 	capacity := 100
-	lfu := NewLinearLfu(capacity, 1.0)
+	lfu := NewLFUDA(capacity)
 	checkCapacity(t, lfu, capacity)
 
 	// sets 0 thru 9

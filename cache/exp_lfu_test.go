@@ -1,13 +1,9 @@
 /******************************************************************************
- * lfu_test.go
+ * exp_lfu_test.go
  * Author:
  * Usage:    `go test`  or  `go test -v`
  * Description:
- *    An incomplete unit testing suite for lfu.go. You are welcome to change
- *    anything in this file however you would like. You are strongly encouraged
- *    to create additional tests for your implementation, as the ones provided
- *    here are extremely basic, and intended only to demonstrate how to test
- *    your program.
+ *    A unit testing suite for exp_lfu.go
  ******************************************************************************/
 
 package cache

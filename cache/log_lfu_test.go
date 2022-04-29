@@ -1,13 +1,9 @@
 /******************************************************************************
- * lfu_test.go
+ * log_lfu_test.go
  * Author:
  * Usage:    `go test`  or  `go test -v`
  * Description:
- *    An incomplete unit testing suite for lfu.go. You are welcome to change
- *    anything in this file however you would like. You are strongly encouraged
- *    to create additional tests for your implementation, as the ones provided
- *    here are extremely basic, and intended only to demonstrate how to test
- *    your program.
+ *    An unit testing suite for log_lfu.go
  ******************************************************************************/
 
 package cache
@@ -48,7 +44,7 @@ func TestLogGet(t *testing.T) {
 	}
 }
 
-func TestLogRemove(t * testing.T) {
+func TestLogRemove(t *testing.T) {
 	capacity := 64
 	lfu := NewLogLfu(capacity, 1.0, 2.0)
 	checkCapacity(t, lfu, capacity)
@@ -80,7 +76,7 @@ func TestLogRemove(t * testing.T) {
 
 		if !bytesEqual(val, refVal) {
 			t.Errorf("Wrong value %s for binding %s with key: %s", val, key, refVal)
-			
+
 			t.FailNow()
 		}
 	}
@@ -113,7 +109,7 @@ func TestLogEvictSimple(t *testing.T) {
 	// 8: 1
 	// 9: 1
 
-	// get 0 thru 8 
+	// get 0 thru 8
 	for i := 0; i < 9; i++ {
 		key := fmt.Sprintf("____%d", i)
 		res, found := lfu.Get(key)
@@ -153,7 +149,6 @@ func TestLogEvictSimple(t *testing.T) {
 	// 7: 2
 	// 8: 2
 	// 10: 1
-
 
 	// gets 0 thru 10, 9 should not get cache hit
 	for i := 0; i <= 10; i++ {
@@ -200,7 +195,7 @@ func TestLogEvict(t *testing.T) {
 	// 8: 1
 	// 9: 1
 
-	// get 0 thru 9 
+	// get 0 thru 9
 	for i := 0; i < 10; i++ {
 		for j := 0; j <= i; j++ {
 			key := fmt.Sprintf("____%d", i)
@@ -242,7 +237,6 @@ func TestLogEvict(t *testing.T) {
 	// 8: 10
 	// 9: 11
 	// 10: 1
-
 
 	// gets 0 thru 10, 0 should not get cache hit
 	for i := 0; i <= 10; i++ {
