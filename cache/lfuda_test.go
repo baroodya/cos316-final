@@ -42,6 +42,21 @@ func TestLFUDASetGet(t *testing.T) {
 			t.FailNow()
 		}
 	}
+
+	// allows empty string as valid key
+	key := ""
+	val := []byte("val")
+	ok := lfu.Set(key, val)
+	if !ok {
+		t.Errorf("Failed to add binding with key: %s", key)
+		t.FailNow()
+	}
+
+	res, _ := lfu.Get(key)
+	if !bytesEqual(res, val) {
+		t.Errorf("Wrong value %s for binding with key: %s", res, key)
+		t.FailNow()
+	}
 }
 
 func TestLFUDARemove(t *testing.T) {
@@ -82,25 +97,170 @@ func TestLFUDARemove(t *testing.T) {
 	}
 }
 
-/*func TestLFUDALen(t *testing.T) {
+func TestLFUDALen(t *testing.T) {
 	// length of empty
+	capacity := 100
+	lfu := NewLFUDA(capacity)
+	len := lfu.Len()
+
+	if len != 0 {
+		t.Errorf("Empty LFU does not have length 0, instead has length %d", len)
+		t.FailNow()
+	}
 
 	// add some and verify length
+	key := "Hello"
+	val := []byte("World")
+	ok := lfu.Set(key, val)
+	if !ok {
+		t.Errorf("Failed to add binding with key: %s", key)
+		t.FailNow()
+	}
+
+	len = lfu.Len()
+	if len != 1 {
+		t.Errorf("LFU does not have length 1, instead has length %d", len)
+		t.FailNow()
+	}
 
 	// take some out and verify length
+	_, ok = lfu.Remove(key)
+	if !ok {
+		t.Errorf("Failed to remove binding with key: %s", key)
+		t.FailNow()
+	}
+	len = lfu.Len()
+
+	if len != 0 {
+		t.Errorf("Empty LFU does not have length 0, instead has length %d", len)
+		t.FailNow()
+	}
 
 }
 
 func TestLFUDAMaxStorage(t *testing.T) {
-	// set max storage to real number
+	// set max storage to 100
+	capacity := 100
+	lfu := NewLFUDA(capacity)
+	checkCapacity(t, lfu, capacity)
 
 	// set max storage to 0
+	capacity = 0
+	lfu = NewLFUDA(capacity)
+	checkCapacity(t, lfu, capacity)
 
+	// set max storage to positive val
+	capacity = 1024
+	lfu = NewLFUDA(capacity)
+	checkCapacity(t, lfu, capacity)
 }
 
 func TestLFUDARemainingStorage(t *testing.T) {
+	// remaining storage before adding
+	capacity := 10
+	lfu := NewLFUDA(capacity)
+	rem := lfu.RemainingStorage()
 
-} */
+	if rem != capacity {
+		t.Errorf("%d of remaining storage in empty cache, should be %d", rem, capacity)
+		t.FailNow()
+	}
+
+	// remaining storage after adding
+	key := "12345"
+	val := []byte(key)
+	ok := lfu.Set(key, val)
+	if !ok {
+		t.Errorf("Failed to add binding with key: %s", key)
+		t.FailNow()
+	}
+
+	rem = lfu.RemainingStorage()
+	if rem != 0 {
+		t.Errorf("Remaining storage should be 0 for a full cache but is %d", rem)
+		t.FailNow()
+	}
+
+	// remaining storage after removing
+	_, ok = lfu.Remove(key)
+	if !ok {
+		t.Errorf("Failed to remove binding with key: %s", key)
+		t.FailNow()
+	}
+
+	rem = lfu.RemainingStorage()
+	if rem != capacity {
+		t.Errorf("%d of remaining storage in empty cache, should be %d", rem, capacity)
+		t.FailNow()
+	}
+}
+
+func TestLFUDAZeroCapacity(t *testing.T) {
+	capacity := 0
+	lfu := NewLFUDA(capacity)
+	checkCapacity(t, lfu, capacity)
+
+	// check Get() returns no binding when called on empty cache
+	key := "key"
+	_, found := lfu.Get(key)
+	if found {
+		t.Errorf("Inaccurately found binding with key: %s", key)
+		t.FailNow()
+	}
+
+	cacheMisses := lfu.Stats().Misses
+	cacheHits := lfu.Stats().Hits
+	if cacheMisses != 1 || cacheHits != 0 {
+		t.Errorf("Incorrect cache stats.\n Cache Hits: %d\n Cache Misses: %d\n", cacheHits, cacheMisses)
+	}
+
+	// Set() only allows zero-size bindings in a zero-capacity cache
+	key = "hello"
+	value := []byte("world")
+	ok := lfu.Set(key, value)
+	if ok {
+		t.Errorf("Should have failed to add binding with key: %s", key)
+		t.FailNow()
+	}
+
+	key = ""
+	value = []byte("")
+	ok = lfu.Set(key, value)
+	if !ok {
+		t.Errorf("Failed to add binding with key: %s", key)
+		t.FailNow()
+	}
+
+	_, found = lfu.Get(key)
+	if !found {
+		t.Errorf("Failed to find binding with key: %s", key)
+		t.FailNow()
+	}
+}
+
+func TestLFUDATooLarge(t *testing.T) {
+	capacity := 10
+	lfu := NewLFUDA(capacity)
+
+	// set rejects bindings too large for cache
+	key := "123456"
+	value := []byte(key)
+	ok := lfu.Set(key, value)
+	if ok {
+		t.Errorf("Should have failed to add binding with key: %s", key)
+		t.FailNow()
+	}
+
+	// ensure cache still empty
+	len := lfu.Len()
+	if len != 0 {
+		t.Errorf("Cache should be empty but has length %d", len)
+	}
+	rem := lfu.RemainingStorage()
+	if rem != capacity {
+		t.Errorf("Cache should be empty but has remaining storage %d", rem)
+	}
+}
 
 func TestLFUDAEvictSimple(t *testing.T) {
 	capacity := 100
@@ -274,4 +434,82 @@ func TestLFUDAEvict(t *testing.T) {
 			t.FailNow()
 		}
 	}
+}
+
+func TestLFUDAAllMisses(t *testing.T) {
+	capacity := 20
+	numKeys := 3
+	lfu := NewLFUDA(capacity)
+	checkCapacity(t, lfu, capacity)
+
+	// sets 1 thru 3
+	for i := 1; i <= numKeys; i++ {
+		key := fmt.Sprintf("____%d", i)
+		val := []byte(key)
+		ok := lfu.Set(key, val)
+		if !ok {
+			t.Errorf("Failed to add binding with key: %s", key)
+			t.FailNow()
+		}
+	}
+
+	// get 1 through 3, should all be misses
+	for i := 1; i <= numKeys; i++ {
+		key := fmt.Sprintf("____%d", i)
+		val := []byte(key)
+		_, found := lfu.Get(key)
+		if !found {
+			lfu.Set(key, val)
+		}
+	}
+
+	cacheMisses := lfu.Stats().Misses
+	if cacheMisses != numKeys {
+		t.Errorf("Should have %d cache misses, only has %d", numKeys, cacheMisses)
+		t.FailNow()
+	}
+
+	cacheHits := lfu.Stats().Hits
+	if cacheHits != 0 {
+		t.Errorf("Should have 0 cache hits, has %d", cacheHits)
+		t.FailNow()
+
+	}
+}
+
+func TestLFUDAAllHits(t *testing.T) {
+	capacity := 30
+	numKeys := 3
+	lfu := NewLFUDA(capacity)
+	checkCapacity(t, lfu, capacity)
+
+	// sets 1 thru 3
+	for i := 1; i <= numKeys; i++ {
+		key := fmt.Sprintf("____%d", i)
+		val := []byte(key)
+		ok := lfu.Set(key, val)
+		if !ok {
+			t.Errorf("Failed to add binding with key: %s", key)
+			t.FailNow()
+		}
+	}
+
+	// get 1 through 3, should all be hits
+	for i := 1; i <= numKeys; i++ {
+		key := fmt.Sprintf("____%d", i)
+		lfu.Get(key)
+	}
+
+	cacheMisses := lfu.Stats().Misses
+	if cacheMisses != 0 {
+		t.Errorf("Should have 0 cache misses, has %d", cacheMisses)
+		t.FailNow()
+	}
+
+	cacheHits := lfu.Stats().Hits
+	if cacheHits != numKeys {
+		t.Errorf("Should have %d cache hits, only has %d", numKeys, cacheHits)
+		t.FailNow()
+	}
+
 }

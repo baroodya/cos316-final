@@ -234,7 +234,6 @@ func TestZeroCapacity(t *testing.T) {
 		t.Errorf("Failed to find binding with key: %s", key)
 		t.FailNow()
 	}
-
 }
 
 func TestTooLarge(t *testing.T) {
@@ -493,7 +492,7 @@ func TestAllHits(t *testing.T) {
 		}
 	}
 
-	// get 1 through 3, should all be misses
+	// get 1 through 3, should all be hits
 	for i := 1; i <= numKeys; i++ {
 		key := fmt.Sprintf("____%d", i)
 		lfu.Get(key)
