@@ -135,7 +135,6 @@ func TestLFUDALen(t *testing.T) {
 		t.Errorf("Empty LFU does not have length 0, instead has length %d", len)
 		t.FailNow()
 	}
-
 }
 
 func TestLFUDAMaxStorage(t *testing.T) {
@@ -511,5 +510,4 @@ func TestLFUDAAllHits(t *testing.T) {
 		t.Errorf("Should have %d cache hits, only has %d", numKeys, cacheHits)
 		t.FailNow()
 	}
-
 }
