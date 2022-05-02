@@ -43,5 +43,6 @@ func checkCapacity(t *testing.T, cache Cache, capacity int) {
 	max := cache.MaxStorage()
 	if max != capacity {
 		t.Errorf("Expected %s to have %d MaxStorage, but it had %d", cacheType(cache), capacity, max)
+		t.FailNow()
 	}
 }
